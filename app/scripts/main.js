@@ -49,19 +49,19 @@
     var client = new QRClient();
 
     var self = this;
+    var imageDecoderWorker = new Worker('scripts/jsqrcode/qrworker.js');
 
     this.currentUrl = undefined;
 
-
     this.detectQRCode = function(imageData, callback) {
       callback = callback || function() {};
-
-      client.decode(imageData, function(result) {
-        if(result !== undefined) {
+      imageDecoderWorker.postMessage(imageData);
+      imageDecoderWorker.onmessage = function(result) {
+         if(result.data !== undefined) {
           self.currentUrl = result;
         }
-        callback(result);
-      });
+        callback(result.data);
+      }
     };
 
     this.showDialog = function(url) {
